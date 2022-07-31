@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "rollup": "^2.77.2"
+  },
+  "scripts": {
+    "rollup": "rollup"
+  },
+  "type": "module"
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Async Request Throttler</title>
+    <meta name="viewport" content="width = device-width, initial-scale= 1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./index.js"></script>
+</head>
+
+<body class="pd-1">
+    <h1 class="center-content">Asynchronous Request Throttler</h1>
+
+    <div id="main-container">
+        <fieldset id="createWorkerForm" class="center-content pd-1">
+            <label for="noOfWorkers">Please select the number of worker(s) below :</label>
+            <br />
+            <div>
+                <input id="noOfWorkers" type="range" name="noOfWorkers" min="1" max="10" step="1">
+                <span id="currentNoOfWorkers">NA</span>
+            </div>
+            <button type="button" id="workerSubmitBtn">Set
+                Workers</button>
+            <p id="error-set-worker-limit">Please set a value above to proceed. </p>
+        </fieldset>
+
+        <fieldset id="handleWorkerForm" class="mt-1 pd-1 center-content">
+            <button type="button" id="createRequest">Click to spawn async
+                request</button>
+            <button type="button" id="reset">RESET</button>
+        </fieldset>
+
+        <div id="statusView">
+            <table id="pending">
+                <tr>
+                    <th>PENDING</th>
+                </tr>
+            </table>
+
+            <table id="progress">
+                <tr>
+                    <th>IN-FLIGHT</th>
+                </tr>
+            </table>
+            <table id="completed">
+                <tr>
+                    <th>FINISHED</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

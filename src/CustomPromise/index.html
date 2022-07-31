@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <h5>Sync</h5>
+    <label><b>First:</b>
+        <label>
+            <div id="a.first"></div>
+            <label><b>Second:</b>
+                <label>
+                    <div id="a.second"></div>
+                    <label><b>Third:</b>
+                        <label>
+                            <div id="a.third"></div>
+                            <h5>Sync: Branched</h5>
+                            <label><b>First:</b>
+                                <label>
+                                    <div id="b.first"></div>
+                                    <label><b>Second:</b>
+                                        <label>
+                                            <div id="b.second"></div>
+                                            <label><b>Third:</b>
+                                                <label>
+                                                    <div id="b.third"></div>
+                                                    <h5>ASync</h5>
+                                                    <label><b>First:</b>
+                                                        <label>
+                                                            <div id="c.first"></div>
+                                                            <label><b>Second:</b>
+                                                                <label>
+                                                                    <div id="c.second"></div>
+                                                                    <label><b>Third:</b>
+                                                                        <label>
+                                                                            <div id="c.third"></div>
+                                                                            <h5>ASync: Branched</h5>
+                                                                            <label><b>First:</b>
+                                                                                <label>
+                                                                                    <div id="d.first"></div>
+                                                                                    <label><b>Second:</b>
+                                                                                        <label>
+                                                                                            <div id="d.second"></div>
+                                                                                            <label><b>Third:</b>
+                                                                                                <label>
+                                                                                                    <div id="d.third">
+                                                                                                    </div>
+                                                                                                    <label
+                                                                                                        style="margin-top:20px">LOGS:</label>
+                                                                                                    <div id="log"></div>
+                                                                                                    <script
+                                                                                                        type="text/javascript">
+                                                                                                            /**
+                                                                                                             Implement an fetch rate limiter.
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             fetch(URL).then(..);
+                                                                                                             
+                                                                                                             NO more than N API requests are in-flight at any given point in time.
+                                                                                                             Dont cancel, but queue the requests.
+                                                                                                            --> fetch(URL).then(...);
+                                                                                                            
+                                                                                                            <div>for current Q</div>
+                                                                                                            <div>inflight requests</div>
+                                                                                                            <div>finished request</div>
+                                                                                                            
+                                                                                                            
+                                                                                                            
+                                                                                                            */
+                                                                                                            console.log = (str) => {
+                                                                                                                const el = document.getElementById("log");
+                                                                                                                el.innerHTML = el.innerHTML + "<br/>" + str;
+                                                                                                            }
+
+                                                                                                            function set(id, value) {
+                                                                                                                document.getElementById(id).innerHTML = value;
+                                                                                                                return value;
+                                                                                                            }
+
+
+
+
+                                                                                                            function CustomPromise(callback) {
+                                                                                                                this.data = null;
+                                                                                                                this.successCallbackQueue = [];
+                                                                                                                this.failCallbackQueue = [];
+
+                                                                                                                this.isResolveCalled = false;
+
+                                                                                                                this.resolve = this.resolve.bind(this);
+                                                                                                                this.reject = this.reject.bind(this);
+
+                                                                                                                if (callback)
+                                                                                                                    callback(this.resolve, this.reject);
+                                                                                                            }
+
+                                                                                                            CustomPromise.prototype.then = function (successCallback) {
+
+                                                                                                                if (this.isResolveCalled) {
+                                                                                                                    const newPromise = new CustomPromise(res => res(this.data));
+
+                                                                                                                    const newCallbackQueue = [];
+                                                                                                                    newCallbackQueue.push(successCallback);
+                                                                                                                    newPromise.successCallbackQueue = newCallbackQueue;
+
+                                                                                                                    newPromise.isResolveCalled = this.isResolveCalled;
+
+                                                                                                                    newPromise.executeCallbacks(newPromise.successCallbackQueue);
+                                                                                                                    return newPromise;
+                                                                                                                }
+                                                                                                                else {
+                                                                                                                    const newPromise = new CustomPromise();
+
+                                                                                                                    newPromise.successCallbackQueue.push(successCallback);
+                                                                                                                    this.successCallbackQueue.push(newPromise.resolve);
+
+                                                                                                                    return newPromise;
+                                                                                                                }
+                                                                                                            }
+
+                                                                                                            CustomPromise.prototype.catch = function (failCallback) {
+                                                                                                                this.failQueue.push(failCallback);
+                                                                                                            }
+
+                                                                                                            CustomPromise.prototype.resolve = function (value) {
+                                                                                                                if (value)
+                                                                                                                    this.data = value;  // initialise data with first resolve
+
+                                                                                                                this.executeCallbacks(this.successCallbackQueue);
+                                                                                                                this.isResolveCalled = true; // informs that resolve has been called
+                                                                                                            };
+
+                                                                                                            CustomPromise.prototype.reject = function (value = '') {
+                                                                                                                this.failQueue.forEach(function (fn) { fn(value) });
+                                                                                                            }
+
+                                                                                                            CustomPromise.prototype.executeCallbacks = function (callback) {
+
+                                                                                                                while (callback.length) {
+                                                                                                                    const successCallback = callback.shift(); // pick each callback one by one and process it
+                                                                                                                    const returnedData = successCallback(this.data);
+
+                                                                                                                    if (returnedData)
+                                                                                                                        this.data = returnedData;  // update data if callback returns something
+                                                                                                                }
+                                                                                                            }
+
+                                                                                                            // testcase1: SYNC simple chain
+                                                                                                            new CustomPromise((res) => {
+                                                                                                                res(100)
+                                                                                                            })
+                                                                                                                .then((data) => set("a.first", data))
+                                                                                                                .then(data => (data + 100))
+                                                                                                                .then((data) => set("a.second", data))
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("a.third", data));
+
+                                                                                                            //testcase2: SYNC Branched chain
+                                                                                                            const a = new CustomPromise((res) => {
+                                                                                                                res(100)
+                                                                                                            })
+                                                                                                                .then((data) => set("b.first", data))
+
+                                                                                                            a
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("b.second", data))
+
+                                                                                                            a
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("b.third", data));
+
+                                                                                                            // testcase3.ASYNC. simple chain
+                                                                                                            new CustomPromise((res) => {
+                                                                                                                setTimeout(() => res(100), 1500);
+                                                                                                            })
+                                                                                                                .then((data) => set("c.first", data))
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("c.second", data))
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("c.third", data));
+
+
+                                                                                                            //testcase4.ASYNC branched chain
+                                                                                                            const d = new CustomPromise((res) => {
+                                                                                                                setTimeout(() => res(100), 3000)
+                                                                                                            })
+                                                                                                                .then((data) => set("d.first", data))
+                                                                                                            d
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("d.second", data))
+
+                                                                                                            d
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("d.third", data));
+
+
+                                                                                                            //testcase5 - misc
+                                                                                                            new CustomPromise((res) => {
+                                                                                                                setTimeout(() => res(100), 0)
+                                                                                                            })
+                                                                                                                .then((data) => set("e.first", data))
+                                                                                                            new Promise_((res) => {
+                                                                                                                setTimeout(() => res(100), 0)
+                                                                                                            })
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("e.second", data))
+                                                                                                            new Promise_((res) => {
+                                                                                                                setTimeout(() => res(100), 0)
+                                                                                                            })
+                                                                                                                .then(data => data + 100)
+                                                                                                                .then((data) => set("e.third", data));
+
+
+                                                                                                        </script>
+</body>
+
+</html>
