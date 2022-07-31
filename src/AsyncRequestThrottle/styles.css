@@ -17,8 +17,8 @@ td {
 }
 
 div[id='main-container'] {
-    max-width: 50rem;
-    min-width: 25rem;
+    max-width: 36rem;
+    min-width: 20rem;
     margin: auto;
 }
 
